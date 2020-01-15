@@ -3,6 +3,7 @@ import * as Router from 'koa-router';
 import * as logger from 'koa-logger';
 import * as bodyParser from 'koa-bodyparser';
 import { errorHandler } from "@src/error/error-handler";
+import router from "@src/route/webhook";
 
 const server = new Koa();
 
@@ -16,6 +17,6 @@ index.get('/ping', (ctx) => {
 });
 
 server.use(index.routes());
-// server.use(router.routes());
+server.use(router.routes());
 
 export default server;
