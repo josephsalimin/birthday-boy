@@ -1,0 +1,48 @@
+{
+  "name": "birthday-boy",
+  "version": "1.0.0",
+  "description": "Facebook Messenger Bot for your birthday",
+  "scripts": {
+    "build": "tsc",
+    "prod": "npm run build && npm run start:prod",
+    "dev": "npm run start:dev",
+    "start:prod": "DEBUG=bboy:* node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
+    "start:dev": "nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josephsalimin/birthday-boy.git"
+  },
+  "author": "Joseph Salimin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/josephsalimin/birthday-boy/issues"
+  },
+  "homepage": "https://github.com/josephsalimin/birthday-boy#readme",
+  "dependencies": {
+    "@types/koa-router": "^7.4.0",
+    "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^7.4.0",
+    "mongo": "^0.1.0",
+    "mongoose": "^5.8.7"
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/dotenv": "^8.2.0",
+    "@types/koa": "^2.11.0",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-logger": "^3.1.1",
+    "@types/mongoose": "^5.5.41",
+    "@types/node": "^13.1.6",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "eslint": "^6.8.0",
+    "ts-node": "^8.6.2",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.7.4"
+  }
+}
