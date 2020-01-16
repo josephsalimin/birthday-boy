@@ -14,6 +14,7 @@ module.exports =  {
     '@typescript-eslint/indent': ["error", 2],
     "semi": "off",
     "@typescript-eslint/semi": ["error"],
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/camelcase": "off"
   },
 };

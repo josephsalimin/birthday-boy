@@ -3,7 +3,7 @@ import * as Router from 'koa-router';
 import * as logger from 'koa-logger';
 import * as bodyParser from 'koa-bodyparser';
 import { errorHandler } from "@src/error/error-handler";
-import router from "@src/route/webhook";
+import router from "@src/route";
 
 const server = new Koa();
 
