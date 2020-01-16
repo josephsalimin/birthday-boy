@@ -1,9 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as logger from '@src/service/logger';
 
-const MONGOOSE_HOST = process.env.MONGOOSE_HOST || 'localhost';
-const MONGOOSE_PORT = process.env.MONGOOSE_PORT || '27017';
-const DATABASE = process.env.DATABASE; 
+const MONGO_URI = process.env.MONGO_URI; 
 
 let isConnected = false;
 
@@ -20,7 +18,7 @@ const initiate = async function (): Promise<void> {
       });
     });
 
-    await mongoose.connect(`mongodb://${MONGOOSE_HOST}:${MONGOOSE_PORT}/${DATABASE}`, { useNewUrlParser: true });
+    await mongoose.connect(`mongodb://${MONGO_URI}`, { useNewUrlParser: true });
     isConnected = true; 
   }
 };

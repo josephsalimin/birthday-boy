@@ -1,6 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 
 const FACEBOOK_URL = 'https://graph.facebook.com/v5.0';
+
+export interface MessageProps {
+  text: string;
+  quick_replies?: any[];
+}
 
 const getDefaultHeaders = (): any => {
   return {
@@ -8,20 +13,18 @@ const getDefaultHeaders = (): any => {
   };
 };
 
-const buildReplyMessageResponse = (userId: string, text: string): any => {
+const buildReplyMessageResponse = (userId: string, messageProps: MessageProps): any => {
   return {
     messaging_type: 'RESPONSE',
     recipient: {
       id: userId
     },
-    message: {
-      text: text
-    }
+    message: messageProps
   };
 };
 
-const replyMessage = async (userId: string, text: string): Promise<any> => {
-  const payload: any = buildReplyMessageResponse(userId, text);
+const replyMessage = async (userId: string, messageProps: MessageProps): Promise<AxiosResponse<any>> => {
+  const payload: any = buildReplyMessageResponse(userId, messageProps);
 
   return await axios.post(
     `${FACEBOOK_URL}/me/messages`, 

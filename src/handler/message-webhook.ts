@@ -1,78 +1,110 @@
 import {Context} from 'koa';
 import * as logger from '@src/service/logger';
 import * as API from '@src/service/api';
+import { AxiosResponse } from 'axios';
 import { User, UserDocument } from '@src/model/user';
-import { REPLY_MESSAGE } from '@src/const';
+import { Message } from '@src/model/message';
+import { REPLY_MESSAGE, QUICK_BUTTON } from '@src/const';
 import * as util from 'util';
 import * as dateHelper from '@src/helper/date';
 import * as nameHelper from '@src/helper/name';
+import * as nDaysHelper from '@src/helper/n-days';
 
-const processAddUserName = async function (event: any, user: UserDocument): Promise<any> {
-  const userId = event.sender.id;
+const processAddUserName = async function (event: any, user: UserDocument): Promise<AxiosResponse<any>> {
   const message = event.message.text;
-  const name = message.split(' ')[0];
-  let replyMessage;
+  const name = (message.split(' ')[0]);
+
   if (nameHelper.isValidName(name)) {
     user.name = name.charAt(0).toUpperCase() + name.slice(1);
     await user.save();
 
-    replyMessage = util.format(REPLY_MESSAGE.NAME_ADDED, name);
+    return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.NAME_ADDED) } as API.MessageProps);
   } else {
-    replyMessage = util.format(REPLY_MESSAGE.INVALID_NAME);
+    return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.INVALID_NAME) } as API.MessageProps);
   }
-
-  return await API.replyMessage(userId, replyMessage);
 };
 
-const processAddBirthday = async function (event: any, user: UserDocument): Promise<any> {
-  const userId = event.sender.id;
+const processAddBirthday = async function (event: any, user: UserDocument): Promise<AxiosResponse<any>> {
   const message = event.message.text;
-  let replyMessage;
   
   if (dateHelper.isValidDate(message)) {
-    // Split and get birthday with format DD-MM
+    // Split and get birthday with format YYYY-MM-DD
     const parts = message.split("/");
     const day = parseInt(parts[2], 10);
     const month = parseInt(parts[1], 10);
-    const birthday = `${day}-${month}`;
+    const year = parseInt(parts[0], 10);
+    const birthday = `${year}/${month}/${day}`;
 
     user.birthday = birthday;
     await user.save();
 
-    replyMessage = util.format(REPLY_MESSAGE.VALID_DATE);
+    return await API.replyMessage(user.facebookId, { 
+      text: util.format(REPLY_MESSAGE.VALID_DATE),
+      quick_replies: QUICK_BUTTON 
+    } as API.MessageProps);
   } else {
-    replyMessage = util.format(REPLY_MESSAGE.INVALID_DATE);
+    return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.INVALID_DATE) } as API.MessageProps);
   }
-
-  return await API.replyMessage(userId, replyMessage);
 };
 
-const processRegisteredUser = async function (event: any, user: UserDocument): Promise<any> {  
+const processFullyRegistered = async function (event: any, user: UserDocument): Promise<AxiosResponse<any>> {
+  const message = event.message.text.toLowerCase().replace(/[^a-z]/gi, '');
+
+  if (nDaysHelper.isYes(message)) {
+    const currentDate = new Date();
+
+    const parts = user.birthday.split("/");
+    const day = parseInt(parts[2], 10);
+    const month = parseInt(parts[1], 10);    
+
+    const birthday = new Date(currentDate.getFullYear(), month - 1, day);
+
+    if (birthday < currentDate) {
+      birthday.setFullYear(birthday.getFullYear() + 1);
+    }
+
+    const days = Math.ceil((birthday.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)); 
+
+    return await API.replyMessage(user.facebookId, {
+      text: util.format(REPLY_MESSAGE.ANSWER_NEXT_BIRTHDAY, days)
+    });
+  } else if (nDaysHelper.isNo(message)) {
+    return await API.replyMessage(user.facebookId, {
+      text: REPLY_MESSAGE.GOODBYE
+    });
+  } else {
+    return await API.replyMessage(user.facebookId, {
+      text: util.format(REPLY_MESSAGE.ASK_NEXT_BIRTHDAY, user.name),
+      quick_replies: QUICK_BUTTON
+    });
+  }
+};
+
+const processRegisteredUser = async function (event: any, user: UserDocument): Promise<AxiosResponse<any>> {  
   if (!user.name) {
     return await processAddUserName(event, user);  
   } else if (!user.birthday) {
     return await processAddBirthday(event, user);
+  } else {
+    return await processFullyRegistered(event, user);
   }
 };
 
-const processUnregisteredUser = async function (event: any): Promise<any> {
+const processUnregisteredUser = async function (event: any): Promise<AxiosResponse<any>> {
   const userId = event.sender.id;
   const user = new User({ facebookId: userId });
   await user.save();
 
-  const replyMessage = util.format(REPLY_MESSAGE.NOT_REGISTERED);
-
-  return await API.replyMessage(userId, replyMessage);
+  return await API.replyMessage(userId, { text: util.format(REPLY_MESSAGE.NOT_REGISTERED) } as API.MessageProps);
 };
 
-const processUnhandledError = async function (event: any): Promise<any> {
+const processUnhandledError = async function (event: any): Promise<AxiosResponse<any>> {
   const userId = event.sender.id;
-  const replyMessage = util.format(REPLY_MESSAGE.ERROR);
 
-  return await API.replyMessage(userId, replyMessage);
+  return await API.replyMessage(userId, { text: util.format(util.format(REPLY_MESSAGE.ERROR)) } as API.MessageProps);
 };
 
-const processMessageEvent = async function (event: any): Promise<any> {
+const processMessageEvent = async function (event: any): Promise<AxiosResponse<any>> {
   const userId = event.sender.id;
   const user: UserDocument | null = await User.findOne({ facebookId: userId });
 
@@ -87,7 +119,16 @@ const processMessageEvent = async function (event: any): Promise<any> {
   }
 };
 
-const handleMessages = function (ctx: Context): void {
+const addMessageLog = async function (event: any, response: AxiosResponse<any>): Promise<void> {
+  const userId = event.sender.id;
+  const input = event.message.text;
+  const output = JSON.parse(response.config.data).message.text;
+
+  const message = new Message({ userId, input, output });
+  message.save().catch(e => logger.error(e));
+};
+
+const handleMessages = async function (ctx: Context): Promise<void> {
   const { body } = ctx.request;
   logger.info("%O", body);
 
@@ -95,10 +136,7 @@ const handleMessages = function (ctx: Context): void {
     for (const entry of body.entry) {
       for (const event of entry.messaging) {
         if (event.message?.text) {
-          processMessageEvent(event)
-            .catch(err => {
-              logger.error(err.message);
-            });
+          processMessageEvent(event).then(resp => addMessageLog(event, resp));
         }
       }
     }

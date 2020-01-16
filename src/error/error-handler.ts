@@ -5,7 +5,8 @@ const DEFAULT_ERROR_MSG = "Internal Server Error";
 
 const handleError = (ctx, e: Error): void => {
   logger.error(e.stack);
-  ctx.status = 500;
+  // Always return 200 to facebook server :)
+  ctx.status = 200;
   const message = (env === "production") ? DEFAULT_ERROR_MSG : e.message;
   ctx.body = { message: message };
 };
