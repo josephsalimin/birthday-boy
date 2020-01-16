@@ -136,16 +136,17 @@ const handleMessages = async function (ctx: Context): Promise<void> {
     for (const entry of body.entry) {
       for (const event of entry.messaging) {
         if (event.message?.text) {
-          processMessageEvent(event).then(resp => addMessageLog(event, resp));
+          processMessageEvent(event)
+            .then(resp => addMessageLog(event, resp))
+            .catch(err => logger.error(err));
         }
       }
     }
-
-    ctx.status = 200;
-    ctx.body = 'EVENT_RECEIVED';
-  } else {
-    ctx.body = 404;
   }
+
+  // Always return with status 200 to facebook server
+  ctx.status = 200;
+  ctx.body = 'EVENT_RECEIVED';
 };
 
 export default handleMessages;
