@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const FACEBOOK_URL = 'https://graph.facebook.com/v5.0';
-const WAVE_EMOJI = '👋🏻';
 
 const getDefaultHeaders = (): any => {
   return {

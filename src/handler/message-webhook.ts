@@ -2,16 +2,57 @@ import {Context} from 'koa';
 import * as logger from '@src/service/logger';
 import * as API from '@src/service/api';
 import { User, UserDocument } from '@src/model/user';
+import { REPLY_MESSAGE } from '@src/const';
+import * as util from 'util';
+import * as dateHelper from '@src/helper/date';
+import * as nameHelper from '@src/helper/name';
 
-const processRegisteredUser = async function (event: any, user: UserDocument): Promise<any> {
+const processAddUserName = async function (event: any, user: UserDocument): Promise<any> {
   const userId = event.sender.id;
   const message = event.message.text;
+  const name = message.split(' ')[0];
+  let replyMessage;
+  if (nameHelper.isValidName(name)) {
+    user.name = name.charAt(0).toUpperCase() + name.slice(1);
+    await user.save();
 
-  if (!user.name) {
-
+    replyMessage = util.format(REPLY_MESSAGE.NAME_ADDED, name);
+  } else {
+    replyMessage = util.format(REPLY_MESSAGE.INVALID_NAME);
   }
+
+  return await API.replyMessage(userId, replyMessage);
+};
+
+const processAddBirthday = async function (event: any, user: UserDocument): Promise<any> {
+  const userId = event.sender.id;
+  const message = event.message.text;
+  let replyMessage;
   
-  return await API.replyMessage(userId, 'test\ntest');
+  if (dateHelper.isValidDate(message)) {
+    // Split and get birthday with format DD-MM
+    const parts = message.split("/");
+    const day = parseInt(parts[2], 10);
+    const month = parseInt(parts[1], 10);
+    const birthday = `${day}-${month}`;
+
+    user.birthday = birthday;
+    await user.save();
+
+    replyMessage = util.format(REPLY_MESSAGE.VALID_DATE);
+  } else {
+    replyMessage = util.format(REPLY_MESSAGE.INVALID_DATE);
+  }
+
+  return await API.replyMessage(userId, replyMessage);
+};
+
+const processRegisteredUser = async function (event: any, user: UserDocument): Promise<any> {  
+  if (!user.name) {
+    return await processAddUserName(event, user);  
+  } else if (!user.birthday) {
+    return await processAddBirthday(event, user);
+  }
 };
 
 const processUnregisteredUser = async function (event: any): Promise<any> {
@@ -19,10 +60,14 @@ const processUnregisteredUser = async function (event: any): Promise<any> {
   const user = new User({ facebookId: userId });
   await user.save();
 
-  const replyMessage = `
-    Hi! We've detected that you are currently not registered in our server.\n
-    Please provide use first with your first name! Thank you!
-  `;
+  const replyMessage = util.format(REPLY_MESSAGE.NOT_REGISTERED);
+
+  return await API.replyMessage(userId, replyMessage);
+};
+
+const processUnhandledError = async function (event: any): Promise<any> {
+  const userId = event.sender.id;
+  const replyMessage = util.format(REPLY_MESSAGE.ERROR);
 
   return await API.replyMessage(userId, replyMessage);
 };
@@ -31,10 +76,14 @@ const processMessageEvent = async function (event: any): Promise<any> {
   const userId = event.sender.id;
   const user: UserDocument | null = await User.findOne({ facebookId: userId });
 
-  if (!user) {
-    return processUnregisteredUser(event);
-  } else {
-    return processRegisteredUser(event, user);
+  try {
+    if (!user) {
+      return processUnregisteredUser(event);
+    } else {
+      return processRegisteredUser(event, user);
+    }
+  } catch (err) {
+    return processUnhandledError(event);
   }
 };
 

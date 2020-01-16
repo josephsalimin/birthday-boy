@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 export interface UserDocument extends mongoose.Document {
   facebookId: string;
   name: string;
-  birthday: Date;
+  birthday: string;
 }
 
 const schema = new mongoose.Schema({
@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
     type: String
   },
   birthday: {
-    type: Date
+    type: String
   }
 });
 
