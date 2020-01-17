@@ -1,1 +1,1 @@
-web: DEBUG=bboy:* node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js
+web: DEBUG=bboy:* npm run start:prod
