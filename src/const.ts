@@ -28,3 +28,5 @@ export const QUICK_BUTTON = [
     "payload":"no"
   }
 ];
+
+export const VERIFICATION_TOKEN = 'BBOY2020';

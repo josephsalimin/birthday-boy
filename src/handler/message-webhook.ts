@@ -14,11 +14,11 @@ const processAddUserName = async function (event: any, user: UserDocument): Prom
   const message = event.message.text;
   const name = (message.split(' ')[0]);
 
-  if (nameHelper.isValidName(name)) {
+  if (nameHelper.isValidFirstName(name)) {
     user.name = name.charAt(0).toUpperCase() + name.slice(1);
     await user.save();
 
-    return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.NAME_ADDED) } as API.MessageProps);
+    return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.NAME_ADDED, user.name) } as API.MessageProps);
   } else {
     return await API.replyMessage(user.facebookId, { text: util.format(REPLY_MESSAGE.INVALID_NAME) } as API.MessageProps);
   }
@@ -51,22 +51,8 @@ const processFullyRegistered = async function (event: any, user: UserDocument): 
   const message = event.message.text.toLowerCase().replace(/[^a-z]/gi, '');
 
   if (nDaysHelper.isYes(message)) {
-    const currentDate = new Date();
-
-    const parts = user.birthday.split("/");
-    const day = parseInt(parts[2], 10);
-    const month = parseInt(parts[1], 10);    
-
-    const birthday = new Date(currentDate.getFullYear(), month - 1, day);
-
-    if (birthday < currentDate) {
-      birthday.setFullYear(birthday.getFullYear() + 1);
-    }
-
-    const days = Math.ceil((birthday.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)); 
-
     return await API.replyMessage(user.facebookId, {
-      text: util.format(REPLY_MESSAGE.ANSWER_NEXT_BIRTHDAY, days)
+      text: util.format(REPLY_MESSAGE.ANSWER_NEXT_BIRTHDAY, nDaysHelper.getTotalDaysBeforeNextBirthday(user))
     });
   } else if (nDaysHelper.isNo(message)) {
     return await API.replyMessage(user.facebookId, {
@@ -110,12 +96,12 @@ const processMessageEvent = async function (event: any): Promise<AxiosResponse<a
 
   try {
     if (!user) {
-      return processUnregisteredUser(event);
+      return await processUnregisteredUser(event);
     } else {
-      return processRegisteredUser(event, user);
+      return await processRegisteredUser(event, user);
     }
   } catch (err) {
-    return processUnhandledError(event);
+    return await processUnhandledError(event);
   }
 };
 
@@ -136,7 +122,7 @@ const handleMessages = async function (ctx: Context): Promise<void> {
     for (const entry of body.entry) {
       for (const event of entry.messaging) {
         if (event.message?.text) {
-          processMessageEvent(event)
+          await processMessageEvent(event)
             .then(resp => addMessageLog(event, resp))
             .catch(err => logger.error(err));
         }

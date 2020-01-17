@@ -1,5 +1,6 @@
 import * as stringSimilarity from 'string-similarity';
 import { THRESHOLD } from '@src/const';
+import { UserDocument } from '@src/model/user';
 
 const YES_ANSWERS = [
   'yes',
@@ -38,4 +39,24 @@ export const isNo = (text: string): boolean => {
   }
 
   return false;
+};
+
+export const getTotalDaysBeforeNextBirthday = function (user: UserDocument): number {
+  const currentDate = new Date();
+  currentDate.setHours(0);
+  currentDate.setMinutes(0);
+  currentDate.setSeconds(0);
+  currentDate.setMilliseconds(0);
+  
+  const parts = user.birthday.split("/");
+  const day = parseInt(parts[2], 10);
+  const month = parseInt(parts[1], 10);    
+
+  const birthday = new Date(currentDate.getFullYear(), month - 1, day);
+
+  if (birthday < currentDate) {
+    birthday.setFullYear(birthday.getFullYear() + 1);
+  }
+
+  return Math.ceil((birthday.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)); 
 };

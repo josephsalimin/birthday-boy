@@ -1,5 +1,5 @@
 
-export function isValidName(name: string): boolean {
+export function isValidFirstName(name: string): boolean {
   // First check for the pattern
   const regexName = /^[a-zA-Z]{3,}$/;
   

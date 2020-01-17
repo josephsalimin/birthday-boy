@@ -1,9 +1,8 @@
 import {Context} from 'koa';
+import { VERIFICATION_TOKEN } from '@src/const';
 import * as logger from '@src/service/logger';
 
-const VERIFICATION_TOKEN = 'BBOY2020';
-
-const verify = function (ctx: Context): void {
+const verify = async function (ctx: Context): Promise<void> {
   const { query } = ctx.request;
 
   logger.info("%O", query);
