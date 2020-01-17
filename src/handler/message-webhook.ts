@@ -29,7 +29,7 @@ const processAddBirthday = async function (event: any, user: UserDocument): Prom
   
   if (dateHelper.isValidDate(message)) {
     // Split and get birthday with format YYYY-MM-DD
-    const parts = message.split("/");
+    const parts = message.split("-");
     const day = parseInt(parts[2], 10);
     const month = parseInt(parts[1], 10);
     const year = parseInt(parts[0], 10);

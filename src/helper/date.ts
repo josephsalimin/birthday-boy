@@ -1,14 +1,14 @@
 
 export function isValidDate(dateString: string): boolean {
   // First check for the pattern
-  const regexDate = /^\d{4}\/\d{1,2}\/\d{1,2}$/;
+  const regexDate = /^\d{4}-\d{1,2}-\d{1,2}$/;
 
   if (!regexDate.test(dateString)) {
     return false;
   }
 
   // Parse the date parts to integers
-  const parts = dateString.split("/");
+  const parts = dateString.split("-");
   const day = parseInt(parts[2], 10);
   const month = parseInt(parts[1], 10);
   const year = parseInt(parts[0], 10);
