@@ -4,6 +4,7 @@ export interface MessageDocument extends mongoose.Document {
   facebookId: string;
   name: string;
   birthday: string;
+  createdAt: number;
 }
 
 const schema = new mongoose.Schema({
@@ -18,6 +19,10 @@ const schema = new mongoose.Schema({
   },
   output: {
     type: String,
+    required: true
+  },
+  createdAt: { 
+    type: Number, 
     required: true
   },
   __v: { 

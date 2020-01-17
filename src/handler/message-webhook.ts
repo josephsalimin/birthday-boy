@@ -110,7 +110,7 @@ const addMessageLog = async function (event: any, response: AxiosResponse<any>):
   const input = event.message.text;
   const output = JSON.parse(response.config.data).message.text;
 
-  const message = new Message({ userId, input, output });
+  const message = new Message({ userId, input, output, createdAt: (new Date()).getTime() });
   message.save().catch(e => logger.error(e));
 };
 
