@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import * as logger from '@src/service/logger';
 
-const MONGO_URI = process.env.MONGO_URI; 
+const MONGODB_URI = process.env.MONGODB_URI; 
 
 let isConnected = false;
 
@@ -18,7 +18,7 @@ const initiate = async function (): Promise<void> {
       });
     });
 
-    await mongoose.connect(`mongodb://${MONGO_URI}`, { useNewUrlParser: true });
+    await mongoose.connect(`${MONGODB_URI}`, { useNewUrlParser: true });
     isConnected = true; 
   }
 };

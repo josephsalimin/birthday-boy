@@ -1,0 +1,1 @@
+web: DEBUG=bboy:* node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js

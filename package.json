@@ -2,8 +2,10 @@
   "name": "birthday-boy",
   "version": "1.0.0",
   "description": "Facebook Messenger Bot for your birthday",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "postinstall": "npm run test && npm run build",
     "prod": "npm run build && npm run start:prod",
     "dev": "npm run start:dev",
     "start:prod": "DEBUG=bboy:* node -r ts-node/register/transpile-only -r tsconfig-paths/register dist/index.js",
