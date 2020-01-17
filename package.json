@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/josephsalimin/birthday-boy#readme",
   "dependencies": {
-    "@types/koa-router": "^7.4.0",
     "axios": "^0.19.1",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
@@ -38,9 +37,11 @@
     "mongoose": "^5.8.7",
     "string-similarity": "^4.0.1",
     "ts-node": "^8.6.2",
-    "tsconfig-paths": "^3.9.0"
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^3.7.4"
   },
   "devDependencies": {
+    "@types/koa-router": "^7.4.0",
     "@shopify/jest-koa-mocks": "^2.2.1",
     "@types/debug": "^4.1.5",
     "@types/dotenv": "^8.2.0",
@@ -55,8 +56,7 @@
     "@typescript-eslint/parser": "^2.16.0",
     "eslint": "^6.8.0",
     "jest": "^24.9.0",
-    "ts-jest": "^24.3.0",
-    "typescript": "^3.7.4"
+    "ts-jest": "^24.3.0"
   },
   "jest": {
     "moduleFileExtensions": [
