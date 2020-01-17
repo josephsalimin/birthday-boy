@@ -7,10 +7,10 @@ export const REPLY_MESSAGE = {
   NAME_ADDED: `
     Hello %s! It is very nice to know you! For further registration, can you provide me your birthday (YYYY-MM-DD format)? Thank you!
   `,
-  INVALID_DATE: `Please input date with YYYY/MM/DD format! Thank you :)`,
-  VALID_DATE: `Thank you for your input! Do you want to know how many days till your next birtday?`,
+  INVALID_DATE: `Please input date with YYYY-MM-DD format! Thank you :)`,
+  VALID_DATE: `Thank you for your input! Do you want to know how many days till your next birthday?`,
   ASK_NEXT_BIRTHDAY: `Hi %s! Do you want to know how many days till your next birthday?`,
-  ANSWER_NEXT_BIRTHDAY: `There are %d days left until your next birthday`,
+  ANSWER_NEXT_BIRTHDAY: `There are %d days left until your next birthday~`,
   GOODBYE: `Goodbye 👋🏻`,
   ERROR: `Sorry! Something is error :(...`
 };

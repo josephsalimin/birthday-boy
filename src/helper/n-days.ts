@@ -18,7 +18,9 @@ const NO_ANSWERS = [
   'nope',
   'nah',
   'um no',
-  'no'
+  'no',
+  'nuh',
+  'meh'
 ];
 
 export const isYes = (text: string): boolean => {
