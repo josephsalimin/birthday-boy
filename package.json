@@ -37,7 +37,7 @@
     "mongoose": "^5.8.7",
     "string-similarity": "^4.0.1",
     "ts-node": "^8.6.2",
-    "tsconfig-paths": "^3.9.0",
+    "tsconfig-paths": "^3.10.1",
     "typescript": "^3.7.4"
   },
   "devDependencies": {
